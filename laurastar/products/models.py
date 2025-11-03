@@ -19,6 +19,13 @@ class Product(BaseModel):
     description = models.TextField()
     category = models.ForeignKey("products.Category", on_delete=models.CASCADE)
 
+    def related_products(self):
+        products = []
+        for i in Product.objects.filter(category=self.category):
+            if (i not in products) and (i.id != self.id):
+                products.append(i)
+        return products
+
     def __str__(self):
         return self.name
 

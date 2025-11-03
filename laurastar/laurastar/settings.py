@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'unfold',
     'modeltranslation',
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'imagekit',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -114,10 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'ru'
 
 LANGUAGES = (
-    ('en', 'English'),
     ('ru', 'Russian'),
     ('tk', 'Turkmen'),
 )
@@ -148,3 +149,20 @@ LOCALE_PATHS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My API',
+    'DESCRIPTION': 'API documentation',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
