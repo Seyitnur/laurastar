@@ -1,5 +1,8 @@
-from django.shortcuts import render
+from django.db.models import Q
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from products.models import *
 from products.serializers import *
@@ -19,66 +22,34 @@ class OrderView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
 def index(request):
+    return render(request, 'index.html')
 
-    ironing_systems = Product.objects.filter(category='Гладильные системы')[:2]
-    steam_generators = Product.objects.filter(category='Парогенераторы')[:2]
-    steamers = Product.objects.filter(category='Отпариватели')[:2]
-
-    context = {
-        'ironing_systems': ironing_systems,
-        'steam_generators': steam_generators,
-        'steamers': steamers,
-    }
-
-    return render(request, 'index.html', context)
-
-def about_us(request):
-    return render(request, 'about_us.html')
-
-def technologies(request):
-    return render(request, 'technologies.html')
-
+@api_view(['GET'])
 def shop(request, i):
     category = Category.objects.get(id=i)
     products = Product.objects.filter(category=category)
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
 
-    context = {
-        'products': products,
-    }
-
-    return render(request, 'shop.html', context)
-
+@api_view(['GET'])
 def product_detail(request, i):
-
     product = Product.objects.get(id=i)
     related_products = product.related_products()
+    serializer = ProductSerializer(product, many=False)
+    serializer2 = ProductSerializer(related_products, many=True)
+    return Response({"product": serializer.data, "related_product": serializer2.data})
 
-    context = {
-        'product': product,
-        'related_products': related_products,
-    }
+class ProductSearchView(APIView):
+    def post(self, request):
+        search = request.data.get('search', '').strip()
+        products = Product.objects.filter(Q(name_ru__contains=search) | Q(name_tk__contains=search))
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
-    return render(request, 'product_detail.html', context)
-
-def service(request):
-    return render(request, 'service.html')
-
-def cart(request):
-
-    context = {}
-
-    return render(request, 'cart.html', context)
-
-def search_product(request):
-    search = request.POST.get('search')
-    products = Product.objects.filter(name__contains=search)
-
-    context = {
-        'product':products,
-        'search':search,
-    }
-
-    return render(request, 'shop.html', context)
-
-def checkout_order(request):
-    pass
+class OrderCreateView(APIView):
+    def post(self, request):
+        serializer = OrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response({'order': serializer.data})

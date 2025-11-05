@@ -8,12 +8,13 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
     
-class CartItem(BaseModel):
+class OrderItem(BaseModel):
     product = models.ForeignKey("products.Product", on_delete=models.CASCADE, null=True)
     quantity = models.PositiveIntegerField(default=0)
+    order = models.ForeignKey("carts.Order", related_name='items', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.product.name}({self.cart.user})'
+        return f'{self.product.name}'
 
 class Order(BaseModel):
     customer_name = models.CharField(max_length=255)
@@ -22,4 +23,4 @@ class Order(BaseModel):
     status = models.CharField(max_length=255, default='Ordered')
     
     def __str__(self):
-        return (f'{self.cart.user} order')
+        return (f'{self.customer_name} order')

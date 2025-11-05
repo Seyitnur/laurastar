@@ -31,14 +31,13 @@ urlpatterns = i18n_patterns(
     path('api/v1/product/', ProductView.as_view()),
     path('api/v1/order/', OrderView.as_view()),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/swagger_ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('', views.index),
     path('shop/<int:i>/', views.shop),
     path('product_detail/<int:i>/', views.product_detail),
-    path('search_product/', views.search_product),
-    path('cart/', views.cart),
-    path('checkout_order/', views.checkout_order),
+    path('search_product/', views.ProductSearchView.as_view()),
+    path('checkout_order/', views.OrderCreateView.as_view()),
 )
 
 if settings.DEBUG:
