@@ -25,22 +25,22 @@ def index(request):
 def shop(request):
     category = request.GET.get('category')
     products = Product.objects.filter(category=category)
-    serializer = ProductSerializer(products, many=True)
+    serializer = ProductSerializer(products, many=True, context={'request': request})
     return Response(serializer.data)
 
 @api_view(['GET'])
 def product_detail(request, i):
     product = Product.objects.get(id=i)
     related_products = product.related_products()
-    serializer = ProductSerializer(product, many=False)
-    serializer2 = ProductSerializer(related_products, many=True)
+    serializer = ProductSerializer(product, many=False, context={'request': request})
+    serializer2 = ProductSerializer(related_products, many=True, context={'request': request})
     return Response({"product": serializer.data, "related_product": serializer2.data})
 
 class ProductSearchView(APIView):
     def get(self, request):
         search = request.GET.get('search')
         products = Product.objects.filter(Q(name_ru__contains=search) | Q(name_tk__contains=search))
-        serializer = ProductSerializer(products, many=True)
+        serializer = ProductSerializer(products, many=True, context={'request': request})
         return Response(serializer.data)
 
 class OrderCreateView(APIView):
