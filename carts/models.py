@@ -26,7 +26,14 @@ class Order(BaseModel):
     customer_name = models.CharField(max_length=255)
     customer_phone = models.CharField(max_length=255)
     customer_email = models.EmailField(max_length=254)
+    customer_address = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=255, choices=status_choises, default='В ожидании')
+
+    def total_price(self):
+        total = 0
+        for i in self.items.all():
+            total += i.quantity * i.product.new_price
+        return total
     
     def __str__(self):
         return (f'{self.customer_name} order')

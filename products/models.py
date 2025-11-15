@@ -33,3 +33,4 @@ class Product(BaseModel):
 class Image(BaseModel):
     image = models.ImageField(upload_to='products')
     product = models.ForeignKey("products.Product", related_name='images', on_delete=models.CASCADE)
+    order = models.IntegerField()

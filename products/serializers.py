@@ -6,15 +6,22 @@ class ImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Image
-        fields = ['image']
-    
-    def get_image(self, obj):
-        request = self.context.get("request")
-        return request.build_absolute_uri(obj.image.url)
+        fields = ['image', 'order']
 
 class ProductSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
+    main_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['name_ru', 'name_tk', 'price', 'category', 'description_ru', 'description_tk', 'images']
+        fields = ['id', 'name_ru', 'name_tk', 'price', 'category', 'description_ru', 'description_tk', 'main_image', 'images']
+    
+    def get_images(self, obj):
+        request = self.context.get("request")
+        images = obj.images.exclude(order=1).order_by('order')
+        return {img.order: request.build_absolute_uri(img.image.url) for img in images}
+    
+    def get_main_image(self, obj):
+        request = self.context.get("request")
+        img = obj.images.filter(order=1).first()
+        return request.build_absolute_uri(img.image.url) if img else None
